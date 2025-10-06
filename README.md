@@ -5,12 +5,10 @@ using System.Security.Cryptography;
 
 public class User
 {
-    // Properties use PascalCase
     public string Name { get; set; }
     public string Email { get; set; }
     public string Password { get; set; }
 
-    // Encrypt password using Base64 encoding
     public void EncryptData()
     {
         if (!string.IsNullOrEmpty(Password))
@@ -19,7 +17,6 @@ public class User
         }
     }
 
-    // Generate a SHA256 hash for the serialized object
     public string GenerateHash()
     {
         using (SHA256 sha256 = SHA256.Create())
@@ -29,7 +26,6 @@ public class User
         }
     }
 
-    // Convert the object into a JSON string
     public override string ToString()
     {
         return JsonSerializer.Serialize(this);
@@ -40,60 +36,63 @@ public class Program
 {
     public static void Main()
     {
-        Console.WriteLine("=== Secure User Serialization Example ===");
+        Console.WriteLine("=========================================");
+        Console.WriteLine("   SECURE USER SERIALIZATION EXAMPLE");
+        Console.WriteLine("=========================================");
 
-        // Create user object
         User user = new User
         {
-            Name = "Alice",
+            Name = "ALICE",
             Email = "alice@example.com",
             Password = "SecureP@ss123"
         };
 
-        // Step 1: Validate user input
         if (!ValidateUser(user))
         {
-            Console.WriteLine("Invalid user data. Serialization aborted.");
+            Console.WriteLine("❌ INVALID USER DATA. SERIALIZATION ABORTED.");
             return;
         }
 
-        // Step 2: Serialize user data securely
         string serializedData = SerializeUserData(user);
-        Console.WriteLine("\nSerialized Data:\n" + serializedData);
+        Console.WriteLine("\n✅ SERIALIZED DATA:");
+        Console.WriteLine(serializedData);
 
-        // Step 3: Demonstrate trusted deserialization
+        Console.WriteLine("\n🔒 GENERATED HASH:");
+        Console.WriteLine(user.GenerateHash());
+
         string trustedSourceData = serializedData;
         User deserializedUser = DeserializeUserData(trustedSourceData, isTrustedSource: true);
 
         if (deserializedUser != null)
         {
-            Console.WriteLine("\nDeserialization successful for trusted source.");
-            Console.WriteLine($"User Name: {deserializedUser.Name}");
-            Console.WriteLine($"User Email: {deserializedUser.Email}");
-            Console.WriteLine($"Encrypted Password: {deserializedUser.Password}");
+            Console.WriteLine("\n✅ DESERIALIZATION SUCCESSFUL (TRUSTED SOURCE)");
+            Console.WriteLine($"👤 NAME: {deserializedUser.Name}");
+            Console.WriteLine($"📧 EMAIL: {deserializedUser.Email}");
+            Console.WriteLine($"🔑 ENCRYPTED PASSWORD: {deserializedUser.Password}");
         }
+
+        Console.WriteLine("\n=========================================");
+        Console.WriteLine("   END OF PROGRAM");
+        Console.WriteLine("=========================================");
     }
 
-    // Serialize user object into JSON string
     public static string SerializeUserData(User user)
     {
         user.EncryptData();
         return JsonSerializer.Serialize(user);
     }
 
-    // Deserialize JSON data back to user object (only if trusted)
     public static User DeserializeUserData(string jsonData, bool isTrustedSource)
     {
         if (!isTrustedSource)
         {
-            Console.WriteLine("⚠️ Deserialization blocked: Untrusted source.");
+            Console.WriteLine("⚠️ DESERIALIZATION BLOCKED: UNTRUSTED SOURCE.");
             return null;
         }
 
         return JsonSerializer.Deserialize<User>(jsonData);
     }
 
-    // Validate name, email, and password before serialization
     public static bool ValidateUser(User user)
     {
         if (string.IsNullOrWhiteSpace(user.Name) ||
@@ -103,7 +102,6 @@ public class Program
             return false;
         }
 
-        // Basic email check
         if (!user.Email.Contains("@") || !user.Email.Contains("."))
         {
             return false;
